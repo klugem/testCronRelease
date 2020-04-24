@@ -1,7 +1,7 @@
 name: cron release management
 on: 
   schedule:
-   - cron: "*/5 * * * *"
+   - cron: '*/5 * * * *'
 
 jobs:
   build:
@@ -14,6 +14,10 @@ jobs:
       - name: test for new commits since last release
         id: skipTest
         run: |
+          # check if there are some tags
+          if [ $(git tag | wc -l) -gt 0 ]; then
+            MESSAGE=$(git log $(git describe --tags --abbrev=0)..HEAD --oneline)
+          fi
           echo ::set-output name=SKIP::1
       - name: create a new release
         if: steps.skipTest.outputs.SKIP != 1
