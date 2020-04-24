@@ -18,7 +18,7 @@ jobs:
           echo ::set-output name=SKIP::1
       - name: create a new release
         if: steps.skipTest.outputs.SKIP != 1
-         run: |
+        run: |
           echo "running 1 "
       - name: create a new release
         if: steps.skipTest.outputs.SKIP == 1
