@@ -47,8 +47,8 @@ jobs:
                   # find base folders part of that commit that are affected
                   FOLDERS=$(git diff-tree --no-commit-id --name-only -r "$ID" | grep -Po '^([^/]+/)' | sort | uniq)
                   # exclude folders that are hidden
-                  FOLDERS=$(echo -e "$FOLDERS" | grep -v '^\s*$' | grep -v '^\.')
-                  FOLDERS_COUNT=$(echo -e "$FOLDERS" | wc -l)
+                  FOLDERS=$(echo -e "$FOLDERS" | grep -v '^\.')
+                  FOLDERS_COUNT=$(echo -e "$FOLDERS" | grep -v '^\s*$' | wc -l)
                   # test if only one base folder is affected
                   if [ $FOLDERS_COUNT -eq 1 ]; then
                     MESSAGE="${MESSAGE}"$'\n'"${ID} [${FOLDERS%/}] ${CM}"
