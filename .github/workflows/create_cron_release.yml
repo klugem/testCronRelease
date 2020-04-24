@@ -14,7 +14,9 @@ jobs:
       - name: test for new commits since last release
         id: skipTest
         run: |
+          ls -la
           cd "$GITHUB_WORKSPACE"
+          ls -la
           # check if there are some tags
           TAGS=$(git tag | wc -l)
           if [ $TAGS -gt 0 ]; then
