@@ -16,7 +16,7 @@ jobs:
         run: |
           cd "$GITHUB_WORKSPACE/master"
           # check if there are some tags
-          git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+          git fetch --prune --unshallow
           TAGS=$(git tag | wc -l)
           echo $TAGS
           if [ $TAGS -gt 0 ]; then
