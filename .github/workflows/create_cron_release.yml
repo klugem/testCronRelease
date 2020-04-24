@@ -18,10 +18,11 @@ jobs:
           # get all tags
           cd "$GITHUB_WORKSPACE/master"
           git fetch --depth=1 origin +refs/tags/*:refs/tags/*
-
+bash --version
           # check if there are some tags at all
           TAG_COUNT=$(git tag | wc -l)
           if [ $TAG_COUNT -gt 0 ]; then
+echo "assdasdas"
             # get commit ids of commits between last release and the HEAD
             LAST_TAG=$(git describe --tags --abbrev=0)
             COMMITS=$(git log "${LAST_TAG}..HEAD" --oneline | cat)
@@ -33,7 +34,7 @@ jobs:
                 LASTV=$(echo "$LAST_TAG" | sed 's/^v//')
                 LASTV=$((LASTV+1))
                 CHANGE=0
-
+echo "in"
                 # prepare relase message
                 MESSAGE="The following commits are part of this release:"$'\n'$'\n'"${MESSAGE}"
 
@@ -42,7 +43,7 @@ jobs:
                 for L in "${COMMITS_ARRAY[@]}"; do
                   ID=$(echo "$L" | cut -f 1 -d " ")
                   CM=$(echo "$L" | cut -c 9-)
-
+echo "loop"
                   # find base folders part of that commit that are affected
                   FOLDERS=$(git diff-tree --no-commit-id --name-only -r "$ID" | grep -Po '^([^/]+/)' | sort | uniq)
                   # exclude folders that are hidden
