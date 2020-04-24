@@ -15,14 +15,17 @@ jobs:
         id: skipTest
         run: |
           cd "$GITHUB_WORKSPACE/master"
-          ls -la
           # check if there are some tags
           TAGS=$(git tag | wc -l)
+          echo $TAGS
           if [ $TAGS -gt 0 ]; then
             MESSAGE=$(git log $(git describe --tags --abbrev=0)..HEAD --oneline)
             LINES=$(echo $MESSAGE | grep -v '^\s*$' | wc -l)
+            echo $LINES
+            echo $MESSAGE
               # new commits since last tag found
-              if [ $TAGS -gt 0 ]; then
+              if [ $LINES -gt 0 ]; then
+                echo "in"
                 # find last tag version
                 LASTV=$(git describe --tags | sed -s /^v//)
                 LASTV=$((LASTV+1))
