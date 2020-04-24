@@ -23,13 +23,22 @@ jobs:
             LINES=$(echo $MESSAGE | grep -v '^\s*$' | wc -l)
               # new commits since last tag found
               if [ $TAGS -gt 0 ]; then
-                echo ::set-output name=SKIP::0
-                echo ::set-output name=MESSAGE::0
+                # find last tag version
+                LASTV=$(git describe --tags | sed -s /^v//)
+                LASTV=$((LASTV+1))
+                # prepare message
+                MESSAGE="${MESSAGE//'%'/'%25'}"
+                MESSAGE="${MESSAGE//$'\n'/'%0A'}"
+                MESSAGE="${MESSAGE//$'\r'/'%0D'}"
+                # set variables
+                echo "::set-output name=SKIP::0"
+                echo "::set-output name=MESSAGE::$MESSAGE"
+                echo "::set-output name=NEW_VERSION::$LASTV"
               else
-                echo ::set-output name=SKIP::1
+                echo "::set-output name=SKIP::1"
               fi
           else
-            echo ::set-output name=SKIP::1
+            echo "::set-output name=SKIP::1"
           fi
       - name: create new release
         if: steps.skipTest.outputs.SKIP != 1
@@ -37,11 +46,8 @@ jobs:
         env:
           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
         with:
-          tag_name: '${{ github.ref }}'
-          release_name: 'Release ${{ github.ref }}'
-          body: |
-            Changes in this Release
-            - First Change
-            - Second Change
+          tag_name: 'v${{ steps.skipTest.outputs.NEW_VERSION }}'
+          release_name: 'Release v${{ steps.skipTest.outputs.NEW_VERSION }}'
+          body: '${{ steps.skipTest.outputs.MESSAGE }}'
           draft: false
           prerelease: false
