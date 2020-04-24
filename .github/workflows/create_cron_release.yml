@@ -15,36 +15,48 @@ jobs:
       - name: test for new commits since last release
         id: skipTest
         run: |
+          # get all tags
           cd "$GITHUB_WORKSPACE/master"
-          # check if there are some tags
           git fetch --depth=1 origin +refs/tags/*:refs/tags/*
-          TAGS=$(git tag | wc -l)
-          if [ $TAGS -gt 0 ]; then
-            git log $(git describe --tags --abbrev=0)..HEAD --oneline | cat
-            COMMITS=$(git log $(git describe --always --tags --abbrev=0)..HEAD --oneline | cat)
-            LINES=$(echo -e $MESSAGE | grep -v '^\s*$' | wc -l)
-              # new commits since last tag found
-              if [ $LINES -gt 0 ]; then
-                # find last tag version
-                LASTV=$(git describe --tags --abbrev=0 | sed 's/^v//')
+
+          # check if there are some tags at all
+          TAG_COUNT=$(git tag | wc -l)
+          if [ $TAG_COUNT -gt 0 ]; then
+            # get commit ids of commits between last release and the HEAD
+            LAST_TAG=$(git describe --tags --abbrev=0)
+            COMMITS=$(git log "${LAST_TAG}..HEAD" --oneline | cat)
+            NUMBER_OF_COMMITS=$(echo -e $COMMITS | grep -v '^\s*$' | wc -l)
+              
+              # test if there are new commits since last created tag
+              if [ $NUMBER_OF_COMMITS -gt 0 ]; then
+                # find the version of the last tag
+                LASTV=$(echo "$LAST_TAG" | sed 's/^v//')
                 LASTV=$((LASTV+1))
                 CHANGE=0
 
-                # prepare message
+                # prepare relase message
                 MESSAGE="The following commits are part of this release:"$'\n'$'\n'"${MESSAGE}"
-                for L in `$COMMITS`; do
+
+                # loop over all commits
+                readarray -t COMMITS_ARRAY <<<"$COMMITS"
+                for L in "${COMMITS_ARRAY[@]}"; do
                   ID=$(echo "$L" | cut -f 1 -d " ")
                   CM=$(echo "$L" | cut -c 9-)
-                  FILES=$(git diff-tree --no-commit-id --name-only -r "$ID" | grep -Po '^([^/]+/)' | sort | uniq)
-                  echo -e "$FILES" 
-                  LINES=$(echo -e "$FILES" | grep -v '^\s*$' | grep -v '^\.')
-                  echo -e "$LINES" 
-                  LINE_COUNT=$(echo -e "$LINES" | wc -l)
-                  if [ $LINE_COUNT -eq 1 ]; then
-                    CHANGE=1
-                    MESSAGE="${MESSAGE}"$'\n'"${ID} [${DIR}] ${CM}"
+
+                  # find base folders part of that commit that are affected
+                  FOLDERS=$(git diff-tree --no-commit-id --name-only -r "$ID" | grep -Po '^([^/]+/)' | sort | uniq)
+                  # exclude folders that are hidden
+                  FOLDERS=$(echo -e "$FOLDERS" | grep -v '^\s*$' | grep -v '^\.')
+                  FOLDERS_COUNT=$(echo -e "$FOLDERS" | wc -l)
+                  # test if only one base folder is affected
+                  if [ $FOLDERS_COUNT -eq 1 ]; then
+                    MESSAGE="${MESSAGE}"$'\n'"${ID} [${FOLDERS%/}] ${CM}"
                   else
                     MESSAGE="${MESSAGE}"$'\n'"${L}"
+                  fi
+                  # test if commit causes a new release
+                  if [ $FOLDERS_COUNT -ge 1 ]; then
+                    CHANGE=1
                   fi
                 done
 
