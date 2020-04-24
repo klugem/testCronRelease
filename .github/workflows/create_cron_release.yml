@@ -20,14 +20,13 @@ jobs:
           git fetch --depth=1 origin +refs/tags/*:refs/tags/*
           TAGS=$(git tag | wc -l)
           if [ $TAGS -gt 0 ]; then
-            git describe --tags --abbrev=0
             git log $(git describe --tags --abbrev=0)..HEAD --oneline | cat
             MESSAGE=$(git log $(git describe --always --tags --abbrev=0)..HEAD --oneline | cat)
             LINES=$(echo $MESSAGE | grep -v '^\s*$' | wc -l)
               # new commits since last tag found
               if [ $LINES -gt 0 ]; then
                 # find last tag version
-                LASTV=$(git describe --tags | sed 's/^v//')
+                LASTV=$(git describe --tags --abbrev=0 | sed 's/^v//')
                 LASTV=$((LASTV+1))
                 # prepare message
                 MESSAGE="${MESSAGE//'%'/'%25'}"
