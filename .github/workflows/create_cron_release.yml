@@ -51,7 +51,7 @@ jobs:
           RELEASE_NAME: watchdog-wms-modules
         with:
           tag_name: 'v${{ steps.skipTest.outputs.NEW_VERSION }}'
-          release_name: "$RELEASE_NAME v${{ steps.skipTest.outputs.NEW_VERSION }}"
+          release_name: '${{RELEASE_NAME}} v${{ steps.skipTest.outputs.NEW_VERSION }}'
           body: '${{ steps.skipTest.outputs.MESSAGE }}'
           draft: false
           prerelease: false
