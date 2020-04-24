@@ -36,7 +36,9 @@ jobs:
                   ID=$(echo "$L" | cut -f 1 -d " ")
                   CM=$(echo "$L" | cut -c 9-)
                   FILES=$(git diff-tree --no-commit-id --name-only -r "$ID" | grep -Po '^([^/]+/)' | sort | uniq)
+                  echo -e "$FILES" 
                   LINES=$(echo -e "$FILES" | grep -v '^\s*$' | grep -v '^\.')
+                  echo -e "$LINES" 
                   LINE_COUNT=$(echo -e "$LINES" | wc -l)
                   if [ $LINE_COUNT -eq 1 ]; then
                     CHANGE=1
