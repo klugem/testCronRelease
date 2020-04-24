@@ -48,10 +48,9 @@ jobs:
         uses: klugem/create-release@v1.0.2
         env:
           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
-          RELEASE_NAME: watchdog-wms-modules
         with:
           tag_name: 'v${{ steps.skipTest.outputs.NEW_VERSION }}'
-          release_name: '${{RELEASE_NAME}} v${{ steps.skipTest.outputs.NEW_VERSION }}'
+          release_name: 'watchdog-wms-modules v${{ steps.skipTest.outputs.NEW_VERSION }}'
           body: '${{ steps.skipTest.outputs.MESSAGE }}'
           draft: false
           prerelease: false
