@@ -9,6 +9,7 @@ jobs:
       - name: checkout master
         uses: klugem/actions_checkout@v2
         with:
+          fetch-depth: "0"
           ref: master
           path: master
       - name: test for new commits since last release
@@ -16,13 +17,12 @@ jobs:
         run: |
           cd "$GITHUB_WORKSPACE/master"
           # check if there are some tags
-          git fetch --prune --unshallow
+          git fetch --depth=1 origin +refs/tags/*:refs/tags/*
           TAGS=$(git tag | wc -l)
           echo $TAGS
           if [ $TAGS -gt 0 ]; then
             git describe --tags --abbrev=0
-            git describe --tags --always --abbrev=0
-            git log $(git describe --tags --always --abbrev=0)..HEAD --oneline | cat
+            git log $(git describe --tags --abbrev=0)..HEAD --oneline | cat
             MESSAGE=$(git log $(git describe --always --tags --abbrev=0)..HEAD --oneline | cat)
             LINES=$(echo $MESSAGE | grep -v '^\s*$' | wc -l)
             echo $LINES
