@@ -27,7 +27,7 @@ jobs:
               # new commits since last tag found
               if [ $LINES -gt 0 ]; then
                 # find last tag version
-                LASTV=$(git describe --tags | sed -s '/^v//')
+                LASTV=$(git describe --tags | sed 's/^v//')
                 LASTV=$((LASTV+1))
                 # prepare message
                 MESSAGE="${MESSAGE//'%'/'%25'}"
