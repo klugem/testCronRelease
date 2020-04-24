@@ -20,7 +20,8 @@ jobs:
           TAGS=$(git tag | wc -l)
           echo $TAGS
           if [ $TAGS -gt 0 ]; then
-            MESSAGE=$(git log $(git describe --tags --abbrev=0)..HEAD --oneline)
+            git log $(git describe --tags --abbrev=0)..HEAD --oneline | cat
+            MESSAGE=$(git log $(git describe --tags --abbrev=0)..HEAD --oneline | cat)
             LINES=$(echo $MESSAGE | grep -v '^\s*$' | wc -l)
             echo $LINES
             echo $MESSAGE
