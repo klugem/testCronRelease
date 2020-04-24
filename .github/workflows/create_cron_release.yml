@@ -1,12 +1,11 @@
-name: create_release
-on:
+name: cron release management
+on: 
   schedule:
-    - cron: '*/5 * * * *'
+   - cron: "*/5 * * * *"
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    steps:
       - name: checkout master
         uses: klugem/actions_checkout@v2
         with:
@@ -20,7 +19,3 @@ jobs:
         if: steps.skipTest.outputs.SKIP != 1
         run: |
           echo "running 1 "
-      - name: create a new release
-        if: steps.skipTest.outputs.SKIP == 1
-        run: |
-          echo "running 2"
