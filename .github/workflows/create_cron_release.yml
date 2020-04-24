@@ -15,6 +15,7 @@ jobs:
       - name: test for new commits since last release
         id: skipTest
         run: |
+          set -xe
           # get all tags
           cd "$GITHUB_WORKSPACE/master"
           git fetch --depth=1 origin +refs/tags/*:refs/tags/*
@@ -62,12 +63,14 @@ jobs:
                 done
 
                 if [ $CHANGE -eq 1 ]; then
+                  echo "change...."
                   # format text
                   MESSAGE="${MESSAGE//'%'/'%25'}"
                   MESSAGE="${MESSAGE//$'\n'/'%0A'}"
                   MESSAGE="${MESSAGE//$'\r'/'%0D'}"
                   # set variables
                   echo "::set-output name=SKIP::0"
+                  echo "message var...."
                   echo "::set-output name=MESSAGE::$MESSAGE"
                   echo "::set-output name=NEW_VERSION::$LASTV"
                 else
