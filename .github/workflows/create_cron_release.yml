@@ -15,11 +15,31 @@ jobs:
         id: skipTest
         run: |
           # check if there are some tags
-          if [ $(git tag | wc -l) -gt 0 ]; then
+          TAGS=$(git tag | wc -l)
+          if [ $TAGS -gt 0 ]; then
             MESSAGE=$(git log $(git describe --tags --abbrev=0)..HEAD --oneline)
+            LINES=$(echo $MESSAGE | grep -v '^\s*$' | wc -l)
+              # new commits since last tag found
+              if [ $TAGS -gt 0 ]; then
+                echo ::set-output name=SKIP::0
+                echo ::set-output name=MESSAGE::0
+              else
+                echo ::set-output name=SKIP::1
+              fi
+          else
+            echo ::set-output name=SKIP::1
           fi
-          echo ::set-output name=SKIP::1
-      - name: create a new release
+      - name: create new release
         if: steps.skipTest.outputs.SKIP != 1
-        run: |
-          echo "running 1 "
+        uses: klugem/create-release@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            Changes in this Release
+            - First Change
+            - Second Change
+          draft: false
+          prerelease: false
