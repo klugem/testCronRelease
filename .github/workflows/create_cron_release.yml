@@ -31,7 +31,7 @@ jobs:
                 LASTV=$(git describe --tags --abbrev=0 | sed 's/^v//')
                 LASTV=$((LASTV+1))
                 # prepare message
-                MESSAGE="The following commits are part of this release:$'\n'$'\n'$MESSAGE"
+                MESSAGE="The following commits are part of this release:\n\n${MESSAGE}"
                 MESSAGE="${MESSAGE//'%'/'%25'}"
                 MESSAGE="${MESSAGE//$'\n'/'%0A'}"
                 MESSAGE="${MESSAGE//$'\r'/'%0D'}"
@@ -52,7 +52,7 @@ jobs:
           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
         with:
           tag_name: 'v${{ steps.skipTest.outputs.NEW_VERSION }}'
-          release_name: '${RELEASE_NAME} v${{ steps.skipTest.outputs.NEW_VERSION }}'
+          release_name: "${RELEASE_NAME} v${{ steps.skipTest.outputs.NEW_VERSION }}"
           body: '${{ steps.skipTest.outputs.MESSAGE }}'
           draft: false
           prerelease: false
